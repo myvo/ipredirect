@@ -1,0 +1,8 @@
+name = IP redirect
+description = Redirect to user's language by IP location.
+package = Utility
+core = 7.x
+
+dependencies[] = locale
+version = "7.x-1.0"
+

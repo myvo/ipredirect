@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Redirect to user's language by IP location.
+ */
+
+/**
+ * Implements hook_init()
+ */
+function ipredirect_init() {
+  if (drupal_is_cli()) {
+    // Do nothing on comment line interface (CLI).
+    return ;
+  } 
+
+  global $base_url, $base_path, $language;
+  $path = drupal_get_path('module', 'ipredirect');
+
+  // Include library.
+  include($path . "/lib/geoip.inc");
+  // Open IP database.
+  $gi = geoip_open($path . "/lib/data/GeoIP.dat", GEOIP_STANDARD);
+
+  // Get user IP.
+  $ip = $_SERVER['REMOTE_ADDR'];
+  // $ip = "115.76.143.46"; // vn
+  // $ip = "176.32.98.44"; // nl
+  // $ip = "192.168.1.23"; // LAN
+  // $ip = "127.0.0.1"; // localhost
+  $country_code = strtolower(geoip_country_code_by_addr($gi, $ip));
+
+  // Close db file.
+  geoip_close($gi);
+
+  // # homepage or localhost or LAN IP.
+  // homepage: $_GET['q'] = node.
+  if ($_GET['q'] !== 'node' || empty($country_code) || isset($_COOKIE['user_lang'])) {
+    return ;
+  }
+
+  $current_language = empty($language->language) ? 'en' : $language->language;
+  // drupal_set_message($country_code . '; lg: ' . $language->language);
+
+  $new_language = '';
+  if ($country_code == 'vn' && $current_language != 'vi') {
+    $new_language = 'vi';
+  }
+  else if ($country_code != 'vn' && $current_language == 'vi') {
+    $new_language = 'en';
+  }
+
+  // Redirect to base URL.
+  if ($new_language != '') {
+    setcookie("user_lang", $new_language, time() + (7 * (24 * 60 * 60)), $base_path);
+    drupal_goto($base_url . '/' . $new_language);
+  }
+}
