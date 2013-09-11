@@ -6,6 +6,22 @@
  */
 
 /**
+ * Implements of hook_menu()
+ */
+function ipredirect_menu() {
+  $items = array();
+
+  $items['select-language'] = array(
+    'title'   => 'Welcome to my page',
+    'access callback' => TRUE,
+    'page callback' => 'ipredirect_select_lang_page',
+    'file'  => 'ipredirect.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_init()
  */
 function ipredirect_init() {
@@ -24,7 +40,7 @@ function ipredirect_init() {
 
   // Get user IP.
   $ip = $_SERVER['REMOTE_ADDR'];
-  // $ip = "115.76.143.46"; // vn
+  $ip = "115.76.143.46"; // vn
   // $ip = "176.32.98.44"; // nl
   // $ip = "192.168.1.23"; // LAN
   // $ip = "127.0.0.1"; // localhost
@@ -39,20 +55,30 @@ function ipredirect_init() {
     return ;
   }
 
-  $current_language = empty($language->language) ? 'en' : $language->language;
-  // drupal_set_message($country_code . '; lg: ' . $language->language);
+  if (!isset($_COOKIE['user_lang'])) {
+    // Redirect to select language page.
+    drupal_goto($base_url . '/select-language' );
+  }
+  // else {
+  //   // Redirect to selected language.
+  //   if ($language->language != $_COOKIE['user_lang'])
+  //     drupal_goto($base_url . '/' . $_COOKIE['user_lang']);
+  // }
 
-  $new_language = '';
-  if ($country_code == 'vn' && $current_language != 'vi') {
-    $new_language = 'vi';
-  }
-  else if ($country_code != 'vn' && $current_language == 'vi') {
-    $new_language = 'en';
-  }
+  // $current_language = empty($language->language) ? 'en' : $language->language;
+  // // drupal_set_message($country_code . '; lg: ' . $language->language);
 
-  // Redirect to base URL.
-  if ($new_language != '') {
-    setcookie("user_lang", $new_language, time() + (7 * (24 * 60 * 60)), $base_path);
-    drupal_goto($base_url . '/' . $new_language);
-  }
+  // $new_language = '';
+  // if ($country_code == 'vn' && $current_language != 'vi') {
+  //   $new_language = 'vi';
+  // }
+  // else if ($country_code != 'vn' && $current_language == 'vi') {
+  //   $new_language = 'en';
+  // }
+
+  // // Redirect to base URL.
+  // if ($new_language != '') {
+  //   setcookie("user_lang", $new_language, time() + (7 * (24 * 60 * 60)), $base_path);
+  //   drupal_goto($base_url . '/' . $new_language);
+  // }
 }
