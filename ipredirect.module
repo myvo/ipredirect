@@ -40,7 +40,7 @@ function ipredirect_init() {
 
   // Get user IP.
   $ip = $_SERVER['REMOTE_ADDR'];
-  $ip = "115.76.143.46"; // vn
+  // $ip = "115.76.143.46"; // vn
   // $ip = "176.32.98.44"; // nl
   // $ip = "192.168.1.23"; // LAN
   // $ip = "127.0.0.1"; // localhost
